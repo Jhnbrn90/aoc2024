@@ -26,6 +26,10 @@ class PathException(Exception):
     pass
 
 
+class LoopException(Exception):
+    pass
+
+
 def get_next_direction(current_direction: str) -> str:
     """Get the next direction given current_direction."""
     current_idx = DIRECTIONS_ORDER.index(current_direction)
@@ -116,6 +120,39 @@ def traverse_grid(grid: list[list[str]]) -> list[list[str]]:
     return grid
 
 
+def traverse_grid_optimized(grid: list[list[str]]) -> set:
+    """Traverse grid completely and return number of unique visits."""
+    visits = set()  # set of coordinates (as tuple)
+    row_count = len(grid)
+    column_count = len(grid[0])
+
+    # Initial coordinates and direction
+    (row, column), direction = find_initial_coordinate_and_direction(grid)
+
+    while True:
+        # Current movement operation
+        row_movement, column_movement = DIRECTION_MOVE[direction]
+
+        while grid[row][column] != "#":
+            if (row, column, direction) in visits:
+                # Check if the row/column are already visited.
+                raise LoopException("Ended up in a loop.")
+            visits.add((row, column, direction))
+            row += row_movement
+            column += column_movement
+
+            if row < 0 or column < 0 or row >= row_count or column >= column_count:
+                # Reached the end
+                return visits
+
+        # When we're here, it means that we've encountered an obstacle '#'
+        # Therefore we update the direction and continue our traversal
+        # Undo the previous step
+        row -= row_movement
+        column -= column_movement
+        direction = get_next_direction(direction)
+    
+
 def count_visits(grid: list[list[str]]) -> int:
     total_visisted = 0 
     for row in grid:
@@ -130,11 +167,9 @@ def main():
         puzzle_input = f.read()
 
     grid = parse_input_to_grid(puzzle_input)
-    path = traverse_grid(grid)
+    visits = traverse_grid_optimized(grid)
 
-    print(f"Took path: {path}")
-    visits = count_visits(path)
-    print(f"Counted {visits} visits.")
+    print(f"Counted visits: {len(visits)}.")
 
 
 if __name__ == "__main__":
