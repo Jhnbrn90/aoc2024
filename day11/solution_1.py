@@ -1,9 +1,6 @@
 def normalise_zeros(number: str) -> str:
     """Remove leading zero's from string."""
-    if all(c == '0' for c in number):
-        return '0'
-
-    return number.lstrip('0')
+    return str(int(number))
 
 
 def blink(initial: str) -> str:
