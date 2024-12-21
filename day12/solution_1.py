@@ -46,6 +46,21 @@ def get_perimeter(garden_plot: set[tuple]):
     return perimeter
 
 
+def get_perimeters(garden_plot: set[tuple]) -> list[tuple]:
+    perimeters = []
+    for (x, y) in garden_plot:
+        for (dx, dy) in DIRECTIONS:
+            new_x = x+dx
+            new_y = y+dy
+            direction_vector = (dx, dy)
+            if (new_x, new_y) not in garden_plot:
+                perimeters.append(
+                    (new_x, new_y, direction_vector)
+                )
+
+    return perimeters
+
+
 def main():
     with open('day12/input_1.txt') as f:
         puzzle_input = f.read()
@@ -67,7 +82,7 @@ def main():
             covered_plots.update(plot)
 
             area = len(plot)
-            perimeter = get_perimeter(plot)
+            perimeter = len(get_perimeters(plot))
 
             total_sum += area*perimeter
 
